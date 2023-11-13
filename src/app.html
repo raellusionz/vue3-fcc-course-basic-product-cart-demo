@@ -23,7 +23,7 @@
             <span>Past Orders</span>
           </a>
         </nav>
-        <a @click="toggleSidebar" class="top-bar-cart-link">
+        <a @click = "toggleSidebar" class="top-bar-cart-link">
           <i class="icofont-cart-alt icofont-1x"></i>
           <span>Cart (0)</span>
         </a>
@@ -41,7 +41,7 @@
 
         <div class="recommended">
 
-          <div class="card">
+          <div v-for = "product in inventory.slice(0,3)" class="card">
             <div class="card-title">
               Carrots
             </div>
@@ -163,8 +163,8 @@
 
       <sidebar
         v-if="showSidebar"
-        :toggle="toggleSidebar"
-        :cart="cart"
+        v-bind:toggle = "toggleSidebar"
+        v-bind:cart = "cart"
       />
 
       <footer>
@@ -174,15 +174,12 @@
       
     <script src="https://unpkg.com/vue@next"></script>
     <script>
+      //PARENT
       let app = Vue.createApp({
         data() {
           return {
             showSidebar: false,
-            inventory: {
-              carrots: 0,
-              pineapples: 0,
-              cherries: 0
-            },
+            inventory: [],
             cart: {
               carrots: 0,
               pineapples: 0,
@@ -197,14 +194,22 @@
           },
           toggleSidebar() {
             this.showSidebar = !this.showSidebar
+          },
+          async mounted(){
+            const res = fetch('./food.json')
+            const data = await res.json()
+            this.inventory = data
           }
+          
         }
       })
 
+
+      //CHILD
       app.component('sidebar', {
-        props: ['toggle', 'cart'],
-        computed: {
-          cartTotal() {
+        props: ['toggle','cart'],
+        computed:{
+          cartTotal(){
             return (this.cart.carrots * 4.82).toFixed(2)
           }
         },
@@ -216,7 +221,7 @@
                   Cart
                   <i class="icofont-cart-alt icofont-1x"></i>
                 </span>
-                <button @click="toggle" class="cart-close">&times;</button>
+                <button @click = "toggle" class="cart-close">&times;</button>
               </h1>
 
               <div class="cart-body">
@@ -236,8 +241,8 @@
                       <td><i class="icofont-carrot icofont-3x"></i></td>
                       <td>Carrot</td>
                       <td>$1.00</td>
-                      <td class="center">{{ cart.carrots }}</td>
-                      <td>\${{ cart.carrots * 4.82 }}</td>
+                      <td class="center">{{cart.carrots}}</td>
+                      <td>\${{cart.carrots*4.82}}</td>
                       <td class="center">
                         <button class="btn btn-light cart-remove">
                           &times;
@@ -249,7 +254,7 @@
 
                 <p class="center"><em>No items in cart</em></p>
                 <div class="spread">
-                  <span><strong>Total:</strong> \${{ cartTotal }}</span>
+                  <span><strong>Total:</strong> \${{cartTotal}}</span>
                   <button class="btn btn-light">Checkout</button>
                 </div>
               </div>
